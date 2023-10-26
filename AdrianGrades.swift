@@ -55,11 +55,3 @@ struct AdrianGrades: View {
     }
 }
 
-@main
-struct GradeTrackerApp: App {
-    var body: some Scene {
-        WindowGroup {
-            ContentView()
-        }
-    }
-}
