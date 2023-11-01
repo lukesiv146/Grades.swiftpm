@@ -11,50 +11,34 @@ struct AdrianGrades: View {
     @State private var grades: [Grade] = []
     @State private var newSubject = ""
     @State private var newScore = ""
-    @State private var isEditing = false 
-
+    
+    private let gradesKey = "SavedGrades"
+    
     var body: some View {
         NavigationView {
-            List {
-                ForEach(grades.indices, id: \.self) { index in
-                    VStack {
-                        Text("\(grades[index].subject): \(grades[index].score)")
-                        Spacer()
-                        if isEditing {
-                            Button(action: {
-                               
-                            }) {
-                                Text("Edit")
-                                    .foregroundColor(.blue)
-                            }
-                            Button(action: {
-                                deleteGrade(at: IndexSet(integer: index))
-                            }) {
-                                Text("Delete")
-                                    .foregroundColor(.red)
-                            }
-                        }
+            VStack {
+                HStack {
+                    TextField("Subject", text: $newSubject)
+                    TextField("Score", text: $newScore)
+                        .keyboardType(.decimalPad)
+                    Button(action: addGrade) {
+                        Text("Add Grade")
                     }
                 }
-                .onDelete(perform: deleteGrade)
-            }
-            .navigationBarTitle("Grade Tracker")
-            .navigationBarItems(trailing: Button(action: {
-                isEditing.toggle()
-            }) {
-                Text(isEditing ? "Done" : "Edit")
-            })
-            
-            VStack(alignment: .leading, spacing: 20) {
-                TextField("Subject", text: $newSubject)
-                TextField("Score", text: $newScore)
-                    .keyboardType(.decimalPad)
-                Button(action: addGrade) {
-                    Text("Add Grade")
+                .padding()
+                
+                List {
+                    ForEach(grades) { grade in
+                        Text("\(grade.subject): \(grade.score)")
+                    }
+                    .onDelete(perform: deleteGrade)
                 }
             }
-            .padding()
+            .navigationBarTitle("Grade Tracker")
+            .navigationBarItems(trailing: EditButton())
         }
+        .onAppear(perform: loadGrades)
+        .onDisappear(perform: saveGrades)
     }
     
     func addGrade() {
@@ -68,5 +52,19 @@ struct AdrianGrades: View {
     
     func deleteGrade(at offsets: IndexSet) {
         grades.remove(atOffsets: offsets)
+    }
+    
+    func loadGrades() {
+        if let data = UserDefaults.standard.data(forKey: gradesKey) {
+            if let loadedGrades = try? JSONDecoder().decode([Grade].self, from: data) {
+                grades = loadedGrades
+            }
+        }
+    }
+    
+    func saveGrades() {
+        if let data = try? JSONEncoder().encode(grades) {
+            UserDefaults.standard.set(data, forKey: gradesKey)
+        }
     }
 }
