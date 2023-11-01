@@ -29,7 +29,7 @@ struct YourApp: App {
             
             NavigationView {
                 
-                LukeView()
+                ContentView()
                 
             }
             
