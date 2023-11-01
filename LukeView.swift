@@ -13,35 +13,35 @@ struct Grade: Identifiable, Codable {
     var score: Double
 }
 
-
 struct LukeView: View {
-    @State var grades: [Grade] = []
-     
-    @State var newSubject = ""
-    @State var newScore = ""
+    @State private var grades: [Grade] = []
+    @State private var newSubject = ""
+    @State private var newScore = ""
     
-   let gradesKey = "SavedGrades"
+    private let gradesKey = "SavedGrades"
     
     var body: some View {
         NavigationView {
-            List {
-                ForEach(grades) { grade in
-                    Text("\(grade.subject): \(grade.score)")
+            VStack {
+                HStack {
+                    TextField("Subject", text: $newSubject)
+                    TextField("Score", text: $newScore)
+                        .keyboardType(.decimalPad)
+                    Button(action: addGrade) {
+                        Text("Add Grade")
+                    }
                 }
-                .onDelete(perform: deleteGrade)
+                .padding()
+                
+                List {
+                    ForEach(grades) { grade in
+                        Text("\(grade.subject): \(grade.score)")
+                    }
+                    .onDelete(perform: deleteGrade)
+                }
             }
             .navigationBarTitle("Grade Tracker")
             .navigationBarItems(trailing: EditButton())
-            
-            HStack {
-                TextField("Subject", text: $newSubject)
-                TextField("Score", text: $newScore)
-                    .keyboardType(.decimalPad)
-                Button(action: addGrade) {
-                    Text("Add Grade")
-                }
-            }
-            .padding()
         }
         .onAppear(perform: loadGrades)
         .onDisappear(perform: saveGrades)
@@ -60,7 +60,6 @@ struct LukeView: View {
         grades.remove(atOffsets: offsets)
     }
     
-    
     func loadGrades() {
         if let data = UserDefaults.standard.data(forKey: gradesKey) {
             if let loadedGrades = try? JSONDecoder().decode([Grade].self, from: data) {
@@ -69,12 +68,9 @@ struct LukeView: View {
         }
     }
     
-    
     func saveGrades() {
         if let data = try? JSONEncoder().encode(grades) {
             UserDefaults.standard.set(data, forKey: gradesKey)
         }
     }
 }
-
-

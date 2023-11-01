@@ -7,11 +7,6 @@
 
 import SwiftUI
 
-//struct Grade: Identifiable {
-//    var id = UUID()
-//    var subject: String
-//    var score: Double
-//}
 
 struct AdrianGrades: View {
     @State private var grades: [Grade] = []
