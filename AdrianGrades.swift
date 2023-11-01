@@ -7,24 +7,45 @@
 
 import SwiftUI
 
-
 struct AdrianGrades: View {
     @State private var grades: [Grade] = []
     @State private var newSubject = ""
     @State private var newScore = ""
-    
+    @State private var isEditing = false 
+
     var body: some View {
         NavigationView {
             List {
-                ForEach(grades) { grade in
-                    Text("\(grade.subject): \(grade.score)")
+                ForEach(grades.indices, id: \.self) { index in
+                    VStack {
+                        Text("\(grades[index].subject): \(grades[index].score)")
+                        Spacer()
+                        if isEditing {
+                            Button(action: {
+                               
+                            }) {
+                                Text("Edit")
+                                    .foregroundColor(.blue)
+                            }
+                            Button(action: {
+                                deleteGrade(at: IndexSet(integer: index))
+                            }) {
+                                Text("Delete")
+                                    .foregroundColor(.red)
+                            }
+                        }
+                    }
                 }
                 .onDelete(perform: deleteGrade)
             }
             .navigationBarTitle("Grade Tracker")
-            .navigationBarItems(trailing: EditButton())
+            .navigationBarItems(trailing: Button(action: {
+                isEditing.toggle()
+            }) {
+                Text(isEditing ? "Done" : "Edit")
+            })
             
-            HStack {
+            VStack(alignment: .leading, spacing: 20) {
                 TextField("Subject", text: $newSubject)
                 TextField("Score", text: $newScore)
                     .keyboardType(.decimalPad)
@@ -49,4 +70,3 @@ struct AdrianGrades: View {
         grades.remove(atOffsets: offsets)
     }
 }
-
